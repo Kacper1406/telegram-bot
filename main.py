@@ -1,5 +1,5 @@
-from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 from telegram import Update, ChatMember, MessageEntity
+from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 import datetime
 import json
 import os
@@ -45,15 +45,6 @@ def track_activity(update: Update, context: CallbackContext) -> None:
     user_id = update.message.from_user.id
     username = update.message.from_user.username or update.message.from_user.first_name
     last_activity[user_id] = {'date': datetime.datetime.utcnow(), 'username': username}
-    save_activity_data(last_activity)
-
-
-def track_new_members(update: Update, context: CallbackContext) -> None:
-    new_members = update.message.new_chat_members
-    for member in new_members:
-        user_id = member.id
-        username = member.username or member.first_name
-        last_activity[user_id] = {'date': datetime.datetime.utcnow(), 'username': username}
     save_activity_data(last_activity)
 
 
@@ -110,7 +101,6 @@ def main() -> None:
 
     dp.add_handler(CommandHandler("ban_or_kick", ban_or_kick))
     dp.add_handler(CommandHandler("show", show_inactive))
-    dp.add_handler(MessageHandler(Filters.status_update.new_chat_members, track_new_members))
 
     media_filters = Filters.audio | Filters.document | Filters.photo | Filters.video | Filters.video_note | Filters.voice
     dp.add_handler(MessageHandler(media_filters & ~Filters.command, track_activity))
